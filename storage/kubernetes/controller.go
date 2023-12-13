@@ -77,6 +77,7 @@ func (s *storage) init(secrets v1controller.SecretController) {
 	s.Lock()
 	defer s.Unlock()
 
+	logrus.Info("111111111111 storage init 11111111111")
 	secrets.OnChange(s.ctx, "tls-storage", func(key string, secret *v1.Secret) (*v1.Secret, error) {
 		if secret == nil {
 			return nil, nil
@@ -130,12 +131,14 @@ func (s *storage) syncStorage() {
 
 	s.Lock()
 	defer s.Unlock()
+	logrus.Info("-------- initialized true")
 	s.initialized = true
 	if updateStorage {
 		if err := s.storage.Update(secret); err != nil {
 			logrus.Warnf("Failed to init backing storage secret: %v", err)
 		}
 	}
+	logrus.Info("------- init done -------")
 }
 
 func (s *storage) Get() (*v1.Secret, error) {

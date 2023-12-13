@@ -6,6 +6,7 @@ import (
 
 	"github.com/rancher/dynamiclistener/factory"
 	v1controller "github.com/rancher/wrangler/pkg/generated/controllers/core/v1"
+	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,11 +47,13 @@ func getClientSecret(secrets v1controller.SecretClient, namespace, name, cn stri
 }
 
 func getSecret(secrets v1controller.SecretClient, namespace, name string) (*v1.Secret, error) {
+	logrus.Info("3333333333 get secret")
 	s, err := secrets.Get(namespace, name, metav1.GetOptions{})
 	if !errors.IsNotFound(err) {
 		return s, err
 	}
 
+	logrus.Info("3333333333 create and store secret")
 	return createAndStore(secrets, namespace, name)
 }
 

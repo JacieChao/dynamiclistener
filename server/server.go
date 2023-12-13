@@ -51,6 +51,7 @@ func ListenAndServe(ctx context.Context, httpsPort, httpPort int, handler http.H
 	errorLog := log.New(logger.WriterLevel(logrus.DebugLevel), "", log.LstdFlags)
 
 	if httpsPort > 0 {
+		logrus.Info("11111111 dynamic listener 111111111")
 		tlsTCPListener, err := dynamiclistener.NewTCPListener(opts.BindHost, httpsPort)
 		if err != nil {
 			return err
@@ -129,11 +130,13 @@ func getTLSListener(ctx context.Context, tcp net.Listener, handler http.Handler,
 		storage = newStorage(ctx, opts)
 	}
 
+	logrus.Info("2222222222 prepare to get ca 22222222")
 	caCert, caKey, err := getCA(opts)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	logrus.Infof("44444444444 get ca %v, %v", caCert, caKey)
 	listener, dynHandler, err := dynamiclistener.NewListenerWithChain(tcp, storage, caCert, caKey, opts.TLSListenerConfig)
 	if err != nil {
 		return nil, nil, err
@@ -143,6 +146,7 @@ func getTLSListener(ctx context.Context, tcp net.Listener, handler http.Handler,
 }
 
 func getCA(opts ListenOpts) ([]*x509.Certificate, crypto.Signer, error) {
+	logrus.Infof("------- get opt %++v", opts)
 	if opts.CAKey != nil {
 		if opts.CAChain != nil {
 			return opts.CAChain, opts.CAKey, nil
@@ -166,12 +170,14 @@ func getCA(opts ListenOpts) ([]*x509.Certificate, crypto.Signer, error) {
 	if opts.CANamespace == "" {
 		opts.CANamespace = "kube-system"
 	}
+	logrus.Info("2222222222 getCA kubernetes load ca chain")
 
 	return kubernetes.LoadOrGenCAChain(opts.Secrets, opts.CANamespace, opts.CAName)
 }
 
 func newStorage(ctx context.Context, opts ListenOpts) dynamiclistener.TLSStorage {
 	var result dynamiclistener.TLSStorage
+	logrus.Info("000000000 new storage 000000000")
 	if opts.CertBackup == "" {
 		result = memory.New()
 	} else {
@@ -189,6 +195,7 @@ func newStorage(ctx context.Context, opts ListenOpts) dynamiclistener.TLSStorage
 	if opts.CertNamespace == "" {
 		opts.CertNamespace = "kube-system"
 	}
+	logrus.Info("11111111111 new storage load 111111111")
 
 	return kubernetes.Load(ctx, opts.Secrets, opts.CertNamespace, opts.CertName, result)
 }
